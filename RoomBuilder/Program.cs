@@ -6,7 +6,9 @@ namespace RoomBuilder
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            BluePrint.Build();
+            Console.ReadLine();
         }
+
     }
 }
