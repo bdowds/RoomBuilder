@@ -1,69 +1,107 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RoomBuilder
 {
     public static class BluePrint
     {
-        //These numbers will change what the room looks like
-        //Besides the fact that it contains three polygons :)
-        //Note: The height is 2x bigger than the width, visually.
-        public static int blueRoomHeight = 5; //Odd numbers work better
-        public static int blueRoomWidth = 11; //Odd numbers work better
-
-        public static int redRoomHeight = 5; //Odd numbers work better
-        public static int redRoomWidth = 11; //Odd numbers work better
-
-        public static int greenRoomWidth = 11; //Odd numbers work better
 
         //Don't change
-        public static int totalHeight = blueRoomHeight + redRoomHeight;
-        public static int totalWidth = (blueRoomWidth > redRoomWidth) ? greenRoomWidth + blueRoomWidth : greenRoomWidth + redRoomWidth;
+        public static int numOfRooms;
+        public static int totalHeight;
+        public static int totalWidth;
+        public static int greatestWidth = 0;
         public static int greenHeightCount = 0;
+        public static List<Room> rooms = new List<Room>();
+        public static List<ConsoleColor> colors = new List<ConsoleColor>() {
+            ConsoleColor.Blue,
+            ConsoleColor.Red,
+            ConsoleColor.Yellow,
+            ConsoleColor.White,
+            ConsoleColor.Cyan
+        };
 
-        public static void Build()
+        public static void Start()
         {
-            BuildRoom(ConsoleColor.Blue, blueRoomWidth, blueRoomHeight);
-            BuildRoom(ConsoleColor.Red, redRoomWidth, redRoomHeight);
-        }
-        public static void BuildRoom(ConsoleColor color, int width, int height)
-        {
-            for (int i = 0; i < height; i++)
+            numOfRooms = AskNumQuestion("How many Rooms (3-6): ", 3, 6);
+            for (int i = 0; i < numOfRooms - 1; i++)
             {
-                if (i == (height / 2))
+                var height = AskNumQuestion($"Height of room {i + 1}: ", 1, 99);
+                var width = AskNumQuestion($"Width of room {i + 1}: ", 1, 99);
+                var room = new Room() { Color = colors[i], Height = height, Width = width, Number = i + 1};
+                rooms.Add(room);
+                totalHeight += room.Height;
+                if (greatestWidth < room.Width)
+                    greatestWidth = room.Width;
+            }
+
+            totalWidth = greatestWidth + AskNumQuestion("Main room width: ", 3, 99);
+
+            Build();
+        }
+
+
+        private static void Build()
+        {
+            for(int i = 0; i < numOfRooms - 1; i++)
+            {
+                BuildRoom(rooms[i]);
+            }
+        }
+
+        private static int AskNumQuestion(string question, int min, int max)
+        {
+            Console.WriteLine(question);
+            var result = 0;
+            while(!int.TryParse(Console.ReadLine(), out result) || result < min || result > max)
+            {
+                Console.Clear();
+                Console.WriteLine($"Please Enter a Number ({min}-{max})");
+                Console.WriteLine(question);
+            }
+            Console.Clear();
+            return result;
+        }
+
+        private static void BuildRoom(Room room)
+        {
+            for (int i = 0; i < room.Height; i++)
+            {
+                if (i == (room.Height / 2))
                 {
-                    Console.ForegroundColor = color;
-                    Squares(width / 2);
-                    Console.Write(1);
-                    Squares(width / 2);
+                    Console.ForegroundColor = room.Color;
+                    Squares(room.Width / 2);
+                    Console.Write(room.Number);
+                    Squares(room.Width / 2);
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Squares(totalWidth - width);
+                    Squares(totalWidth - room.Width);
                     Console.WriteLine();
                     greenHeightCount++;
                     continue;
                 }
                 else if (greenHeightCount == totalHeight / 2)
                 {
-                    Console.ForegroundColor = color;
-                    Squares(width);
+                    Console.ForegroundColor = room.Color;
+                    Squares(room.Width);
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Squares((totalWidth - width) / 2);
-                    Console.Write(2);
-                    Squares((totalWidth - width) / 2);
+                    Squares((totalWidth - room.Width) / 2);
+                    Console.Write(numOfRooms);
+                    Squares((totalWidth - room.Width) / 2);
                     Console.WriteLine();
                     greenHeightCount++;
                     continue;
                 }
-                Console.ForegroundColor = color;
-                Squares(width);
+                Console.ForegroundColor = room.Color;
+                Squares(room.Width);
                 Console.ForegroundColor = ConsoleColor.Green;
-                Squares((totalWidth - width));
+                Squares((totalWidth - room.Width));
                 Console.WriteLine();
                 greenHeightCount++;
             }
         }
-        public static void Squares(int length)
+        private static void Squares(int length)
         {
             Console.Write(new String('█', length));
         }
