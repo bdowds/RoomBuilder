@@ -7,8 +7,17 @@ namespace RoomBuilder
 {
     public static class BluePrint
     {
+        //Changeable
+        public static char RoomFiller = '█';
+
+        //Don't make less than 3 or it will break
+        public static int maxWidth = 99;
+        public static int minWidth = 1;
+        public static int maxRooms = 6;
+
 
         //Don't change
+        public static int minRooms = 3;
         public static int numOfRooms;
         public static int totalHeight;
         public static int totalWidth;
@@ -25,11 +34,11 @@ namespace RoomBuilder
 
         public static void Start()
         {
-            numOfRooms = AskNumQuestion("How many Rooms (3-6): ", 3, 6);
+            numOfRooms = AskNumQuestion($"How many Rooms ({minRooms}-{maxRooms}): ", minRooms, maxRooms);
             for (int i = 0; i < numOfRooms - 1; i++)
             {
-                var height = AskNumQuestion($"Height of room {i + 1}: ", 1, 99);
-                var width = AskNumQuestion($"Width of room {i + 1}: ", 1, 99);
+                var height = AskNumQuestion($"Height of room {i + 1}: ", minWidth, maxWidth);
+                var width = AskNumQuestion($"Width of room {i + 1}: ", minWidth, maxWidth);
                 var room = new Room() { Color = colors[i], Height = height, Width = width, Number = i + 1};
                 rooms.Add(room);
                 totalHeight += room.Height;
@@ -37,7 +46,7 @@ namespace RoomBuilder
                     greatestWidth = room.Width;
             }
 
-            totalWidth = greatestWidth + AskNumQuestion("Main room width: ", 3, 99);
+            totalWidth = greatestWidth + AskNumQuestion("Main room width: ", 3, maxWidth);
 
             Build();
         }
@@ -103,7 +112,7 @@ namespace RoomBuilder
         }
         private static void Squares(int length)
         {
-            Console.Write(new String('█', length));
+            Console.Write(new String(RoomFiller, length));
         }
     }
 }
